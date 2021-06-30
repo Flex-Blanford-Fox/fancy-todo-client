@@ -11,39 +11,94 @@
  * AJAX adalah package yangbantu untuk melakukan http request.
  */
 
+function clearAll(){
+    $("#regName").val(``)
+    $("#regEmail").val(``)
+    $("#regPassword").val(``)
+   
+    $("#email").val(``)
+    $("#password").val(``)
 
-function beforeLogin(){
-    $("#Todos").hide()
-    $("#AddTodos").hide()
-    $("#Login").hide()
-    $("#Logout").hide()
+    $("#todo-title").val(``)
+    $("#todo-description").val(``)
+    $("#todo-duedate").val(``)
+}
+
+function registerPage(){
+    $("#nav-mytodos").hide()
+    $("#nav-addtodos").hide()
+    $("#nav-register").show()
+    $("#nav-login").show()
+    $("#nav-logout").hide()
+
+    $("#submitRegister").show()
+    $("#submitLogin").hide()
+    $("#submitTodo").hide()
+    $("#table-todo").hide()
+
+}
+
+function loginPage(){
+    $("#nav-mytodos").hide()
+    $("#nav-addtodos").hide()
+    $("#nav-register").show()
+    $("#nav-login").show()
+    $("#nav-logout").hide()
+
+    $("#submitRegister").hide()
     $("#submitLogin").show()
     $("#submitTodo").hide()
     $("#table-todo").hide()
 }
 
 function afterLogin(){
-    $("#Todos").show()
-    $("#AddTodos").show()
-    $("#Login").hide()
-    $("#Logout").show()
+    $("#nav-mytodos").show()
+    $("#nav-addtodos").show()
+    $("#nav-register").hide()
+    $("#nav-login").hide()
+    $("#nav-logout").show()
+
+    $("#submitRegister").hide()
     $("#submitLogin").hide()
     $("#table-todo").hide()
     $("#submitTodo").hide()
 }
 
 function addTodo(){
-    $("#Todos").show()
-    $("#AddTodos").show()
-    $("#Login").hide()
-    $("#Logout").show()
+    $("#nav-mytodos").show()
+    $("#nav-addtodos").show()
+    $("#nav-register").hide()
+    $("#nav-login").hide()
+    $("#nav-logout").show()
+    
+    $("#submitRegister").hide()
     $("#submitLogin").hide()
     $("#table-todo").hide()
     $("#submitTodo").show()
 
-    $("#todo-title").val(``)
-    $("#todo-description").val(``)
-    $("#todo-duedate").val(``)
+}
+
+function register(event){
+    event.preventDefault()
+    let name = $("#regName").val()
+    let email = $("#regEmail").val()
+    let password = $("#regPassword").val()
+    let type = "normal"
+ 
+    let user = {name, email, type, password}
+
+    // console.log(user);
+    $.ajax({
+        url: "http://localhost:3000/register", 
+        method: "post",
+        data: user
+    })
+        .done(data=>{
+            loginPage()
+        })
+        .fail(err=>{
+            alert(err.responseJSON.message)
+        })
 }
 
 function login(event){
@@ -64,9 +119,17 @@ function login(event){
             afterLogin()
         })
         .fail(err=>{
-            alert(`Password Salah`)
+            alert(err.responseJSON.message)
         })
 }
+
+function logout(event){
+    event.preventDefault()
+    localStorage.removeItem(`token`)
+    $(`.table-detail`).empty()
+    registerPage()
+}
+
 
 function postTodo(event){
     event.preventDefault()
@@ -86,26 +149,76 @@ function postTodo(event){
         data: newTodo
     })
     .done(data=>{
-        alert(`Todo berhasil di tambahkan`)
-        afterLogin()
         getTodos()
     })
     .fail(err=>{
-        console.log(err.responseJSON.message);
+        // console.log(err.responseJSON.message);
         alert(err.responseJSON.message)
     })
 }
 
-function logout(){
-    event.preventDefault()
-    localStorage.removeItem(`token`)
-    $(`.table-detail`).empty()
-    beforeLogin()
+function deleteTodo(id){
+    $.ajax({
+        url: `http://localhost:3000/todos/${id}`,
+        method: "delete",
+        headers:{
+            token: localStorage.token
+        }
+    })
+    .done(data=>{
+        getTodos()
+    })
+    .fail(err=>{
+        // console.log(err.responseJSON.message);
+        alert(err.responseJSON.message)
+    })
 }
+
+function doneTodo(id, status){
+    $.ajax({
+        url: `http://localhost:3000/todos/${id}`,
+        method: "patch",
+        headers:{
+            token: localStorage.token
+        },
+        data:{
+            status: status
+        }
+    })
+    .done(data=>{
+        getTodos()
+    })
+    .fail(err=>{
+        // console.log(err.responseJSON.message);
+        alert(err.responseJSON.message)
+    })
+}
+
+function editTodo(id){
+    $.ajax({
+        url: `http://localhost:3000/todos/${id}`, 
+        method: "get",
+        headers: {
+            token: localStorage.getItem(`token`)
+        }
+    })
+        .done(data=>{
+            data.due_date = data.due_date.toString().slice(0,10)
+            $("#todo-title").val(`${data.title}`)
+            $("#todo-description").val(`${data.description}`)
+            $("#todo-duedate").val(`${data.due_date}`)
+            addTodo()
+        })
+        .fail(err=>{
+            console.log(err);
+        })
+}
+
 
 function getTodos(){
     event.preventDefault()
     $(`.table-detail`).empty()
+    clearAll()
     $.ajax({
         url: "http://localhost:3000/todos", 
         method: "get",
@@ -124,9 +237,13 @@ function getTodos(){
                     <td>${todo.description}</td>
                     <td>${todo.status}</td>
                     <td>${todo.due_date}</td>
+                    <td> <button  onclick="doneTodo(${todo.id}, '${todo.status === "Not Done" ? 'Done' : 'Not Done'}')" type="button"> ${todo.status === "Not Done" ? "Complete" : "Uncomplete"}</button></td>
+                    <td> <button onclick="editTodo(${todo.id})" type="button" >Edit</button> | <button onclick="deleteTodo(${todo.id})" type="button" >Delete</button></td>
                 </tr>
                 `)
             });
+
+            $("#submitTodo").hide()
             $("#table-todo").show()
         })
         .fail(err=>{
@@ -134,16 +251,24 @@ function getTodos(){
         })
 }
 
+// 
+/* <td> ${todo.status} === "Not Done" ? <button onclick="doneTodo(${todo.id})" type="button" >Complete</button> : <button onclick="undoneTodo(${todo.id})" type="button" >Un-Complete</button></td> */
+
+
 $(document).ready(()=>{
     if (!localStorage.token) {
-        beforeLogin()
+        registerPage()
     } else {
         afterLogin()
     }
+    
+    $("#nav-mytodos").click(getTodos)
+    $("#nav-addtodos").click(addTodo)
+    $("#nav-register").click(registerPage)
+    $("#nav-login").click(loginPage)
+    $("#nav-logout").click(logout)
 
+    $("#submitRegister").submit(register)
     $("#submitLogin").submit(login)
     $("#submitTodo").submit(postTodo)
-    $("#AddTodos").click(addTodo)
-    $("#Todos").click(getTodos)
-    $("#Logout").click(logout)
 })
