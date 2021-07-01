@@ -10,6 +10,18 @@
  * 
  * AJAX adalah package yangbantu untuk melakukan http request.
  */
+function getWeather(){
+    $.ajax({
+        url: "http://localhost:3000/api/weather", 
+        method: "get",
+    })
+        .then(data=>{
+            $("#weather").text(`Todays weather in ${data.city}, is going to ${data.weather}, and the current temperature is ${data.temp}`)
+        })
+        .catch(err=>{
+            console.log(err);
+        })
+}
 
 function clearAll(){
     $("#regName").val(``)
@@ -22,13 +34,21 @@ function clearAll(){
     $("#todo-title").val(``)
     $("#todo-description").val(``)
     $("#todo-duedate").val(``)
+    $("#todo-id").val(``)
+}
+
+function clearTodoForm(){
+    $("#todo-title").val(``)
+    $("#todo-description").val(``)
+    $("#todo-duedate").val(``)
+    $("#todo-id").val(``)
 }
 
 function registerPage(){
     $("#nav-mytodos").hide()
     $("#nav-addtodos").hide()
-    $("#nav-register").show()
-    $("#nav-login").show()
+    $("#nav-register").show().css(`font-weight`, `bold`)
+    $("#nav-login").show().css(`font-weight`, `normal`)
     $("#nav-logout").hide()
 
     $("#submitRegister").show()
@@ -41,9 +61,10 @@ function registerPage(){
 function loginPage(){
     $("#nav-mytodos").hide()
     $("#nav-addtodos").hide()
-    $("#nav-register").show()
-    $("#nav-login").show()
+    $("#nav-register").show().css(`font-weight`, `normal`)
+    $("#nav-login").show().css(`font-weight`, `bold`)
     $("#nav-logout").hide()
+    $("#welcome").text(`Please Login / Register`)
 
     $("#submitRegister").hide()
     $("#submitLogin").show()
@@ -52,21 +73,22 @@ function loginPage(){
 }
 
 function afterLogin(){
-    $("#nav-mytodos").show()
-    $("#nav-addtodos").show()
+    getTodos()
+    $("#nav-mytodos").show().css(`font-weight`, `bold`)
+    $("#nav-addtodos").show().css(`font-weight`, `normal`)
     $("#nav-register").hide()
     $("#nav-login").hide()
     $("#nav-logout").show()
 
     $("#submitRegister").hide()
     $("#submitLogin").hide()
-    $("#table-todo").hide()
+    $("#table-todo").show()
     $("#submitTodo").hide()
 }
 
 function addTodo(){
-    $("#nav-mytodos").show()
-    $("#nav-addtodos").show()
+    $("#nav-mytodos").show().css(`font-weight`, `normal`)
+    $("#nav-addtodos").show().css(`font-weight`, `bold`)
     $("#nav-register").hide()
     $("#nav-login").hide()
     $("#nav-logout").show()
@@ -94,6 +116,7 @@ function register(event){
         data: user
     })
         .done(data=>{
+            alert (`username ${email} succesfully created`)
             loginPage()
         })
         .fail(err=>{
@@ -102,6 +125,7 @@ function register(event){
 }
 
 function login(event){
+    getWeather()
     event.preventDefault()
     let email = $("#email").val()
     let password = $("#password").val()
@@ -116,6 +140,7 @@ function login(event){
     })
         .done(data=>{
             localStorage.setItem(`token`, data.token)
+            $("#welcome").text(`Welcome ${data.name}`)
             afterLogin()
         })
         .fail(err=>{
@@ -125,36 +150,50 @@ function login(event){
 
 function logout(event){
     event.preventDefault()
+    getWeather()
     localStorage.removeItem(`token`)
-    $(`.table-detail`).empty()
-    registerPage()
+    clearAll()
+    loginPage()
 }
 
 
 function postTodo(event){
     event.preventDefault()
+    let id = $("#todo-id").val()
     let title = $("#todo-title").val()
     let description = $("#todo-description").val()
     let status = "Not Done"
     let due_date = $("#todo-duedate").val()
 
     let newTodo = {title, description, status, due_date}
+    let method
+    let url
+
+    if(!id){
+        method = "post"
+        url = "http://localhost:3000/todos"
+    } else {
+        method = "put"
+        url = `http://localhost:3000/todos/${id}`
+    }
 
     $.ajax({
-        url: "http://localhost:3000/todos", 
-        method: "post",
+        url,
+        method,
         headers: {
             token: localStorage.token
         },
         data: newTodo
     })
     .done(data=>{
+        clearTodoForm()
         getTodos()
     })
     .fail(err=>{
         // console.log(err.responseJSON.message);
         alert(err.responseJSON.message)
     })
+
 }
 
 function deleteTodo(id){
@@ -166,7 +205,7 @@ function deleteTodo(id){
         }
     })
     .done(data=>{
-        getTodos()
+        getTodos()         
     })
     .fail(err=>{
         // console.log(err.responseJSON.message);
@@ -204,6 +243,7 @@ function editTodo(id){
     })
         .done(data=>{
             data.due_date = data.due_date.toString().slice(0,10)
+            $("#todo-id").val(`${id}`)
             $("#todo-title").val(`${data.title}`)
             $("#todo-description").val(`${data.description}`)
             $("#todo-duedate").val(`${data.due_date}`)
@@ -212,11 +252,12 @@ function editTodo(id){
         .fail(err=>{
             console.log(err);
         })
+        // $("#editTodo").submit(editTodo)
 }
 
 
 function getTodos(){
-    event.preventDefault()
+    // event.preventDefault()
     $(`.table-detail`).empty()
     clearAll()
     $.ajax({
@@ -242,6 +283,8 @@ function getTodos(){
                 </tr>
                 `)
             });
+            $("#nav-mytodos").show().css(`font-weight`, `bold`)
+            $("#nav-addtodos").show().css(`font-weight`, `normal`)
 
             $("#submitTodo").hide()
             $("#table-todo").show()
@@ -256,8 +299,9 @@ function getTodos(){
 
 
 $(document).ready(()=>{
+    getWeather()
     if (!localStorage.token) {
-        registerPage()
+        loginPage()
     } else {
         afterLogin()
     }
@@ -271,4 +315,5 @@ $(document).ready(()=>{
     $("#submitRegister").submit(register)
     $("#submitLogin").submit(login)
     $("#submitTodo").submit(postTodo)
+    $("#editTodo").submit(editTodo)
 })

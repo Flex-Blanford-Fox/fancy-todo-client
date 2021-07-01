@@ -50,9 +50,9 @@
         padding: 8px;
         }
 
-        tr:nth-child(even) {
+        /* tr:nth-child(even) {
         background-color: #dddddd;
-        }
+        } */
     </style>
 </head>
 <body>
@@ -73,6 +73,8 @@
     <br>
     <br>
     <br>
+    <p id="welcome" style="color: red;">Welcome</p>
+    <p id="weather" style="color: blue;">Todays weather...</p>
     <br>
 
 <!-- Form Register -->
@@ -98,16 +100,20 @@
         </form> 
 
 <!-- Form Add Todo (Bisa gak di gabung sama form edit? tapi kalo di clik submit, harus bedain post sama put. bedainya di mana? taruh di parameter function kah?)-->
+    
     <form id = "submitTodo">
+        <input type="text" hidden id="todo-id">
         <label for="fname">Title:</label><br>
         <input type="text" id="todo-title" name="title"><br>
         <label for="fname">Description:</label><br>
         <input type="text" id="todo-description" name="description"><br>
         <label for="fname"> Due Date:</label><br>
         <input type="date" id="todo-duedate" name="duedate"><br><br>
-        <input type="submit" value="Add Todo">
+        <input type="submit" value="Add/Modify Todo">
     </form> 
+
 <!-- TodoList -->
+
 <table id="table-todo">
     <tr id = "table-header">
         <th>No.</th>
