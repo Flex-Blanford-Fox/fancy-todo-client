@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-signin-client_id" content="720803468380-aqkhnspru3mv4bavbv8o5co365092jvn.apps.googleusercontent.com">
     <title>Fancy To-Do</title>
     <style>
         ul {
@@ -79,25 +80,30 @@
 
 <!-- Form Register -->
 
-<form id = "submitRegister">
-    <label for="fname">Full Name:</label><br>
-    <input type="text" id="regName" name="name"><br>
-    <label for="fname">Email:</label><br>
-    <input type="text" id="regEmail" name="email"><br>
-    <label for="lname">Password:</label><br>
-    <input type="password" id="regPassword" name="password"><br><br>
-    <input type="submit" value="Register">
-</form> 
+    <form id = "submitRegister">
+        <label for="fname">Full Name:</label><br>
+        <input type="text" id="regName" name="name"><br>
+        <label for="fname">Email:</label><br>
+        <input type="text" id="regEmail" name="email"><br>
+        <label for="lname">Password:</label><br>
+        <input type="password" id="regPassword" name="password"><br><br>
+        <input type="submit" value="Register">
+    </form> 
 
 <!-- Form Login -->
 
-        <form id = "submitLogin">
-            <label for="fname">Email:</label><br>
-            <input type="text" id="email" name="email"><br>
-            <label for="lname">Password:</label><br>
-            <input type="password" id="password" name="password"><br><br>
-            <input type="submit" value="Login">
-        </form> 
+    <form id = "submitLogin">
+        <label for="fname">Email:</label><br>
+        <input type="text" id="email" name="email"><br>
+        <label for="lname">Password:</label><br>
+        <input type="password" id="password" name="password"><br><br>
+        <input type="submit" value="Login">
+    </form> 
+    
+    <div id = "googlesign">
+        <p>Or sign in with:</p>
+        <div class="g-signin2" data-onsuccess="onSignIn"></div>
+    </div>
 
 <!-- Form Add Todo (Bisa gak di gabung sama form edit? tapi kalo di clik submit, harus bedain post sama put. bedainya di mana? taruh di parameter function kah?)-->
     
@@ -127,6 +133,7 @@
 </table>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
     <script src="./main.js"></script>
     <a href=""></a>
 </body>

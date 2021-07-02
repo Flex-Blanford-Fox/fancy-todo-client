@@ -50,6 +50,7 @@ function registerPage(){
     $("#nav-register").show().css(`font-weight`, `bold`)
     $("#nav-login").show().css(`font-weight`, `normal`)
     $("#nav-logout").hide()
+    $("#googlesign").show()
 
     $("#submitRegister").show()
     $("#submitLogin").hide()
@@ -64,6 +65,7 @@ function loginPage(){
     $("#nav-register").show().css(`font-weight`, `normal`)
     $("#nav-login").show().css(`font-weight`, `bold`)
     $("#nav-logout").hide()
+    $("#googlesign").show()
     $("#welcome").text(`Please Login / Register`)
 
     $("#submitRegister").hide()
@@ -79,6 +81,7 @@ function afterLogin(){
     $("#nav-register").hide()
     $("#nav-login").hide()
     $("#nav-logout").show()
+    $("#googlesign").hide()
 
     $("#submitRegister").hide()
     $("#submitLogin").hide()
@@ -92,6 +95,8 @@ function addTodo(){
     $("#nav-register").hide()
     $("#nav-login").hide()
     $("#nav-logout").show()
+    $("#googlesign").hide()
+
     
     $("#submitRegister").hide()
     $("#submitLogin").hide()
@@ -100,61 +105,7 @@ function addTodo(){
 
 }
 
-function register(event){
-    event.preventDefault()
-    let name = $("#regName").val()
-    let email = $("#regEmail").val()
-    let password = $("#regPassword").val()
-    let type = "normal"
- 
-    let user = {name, email, type, password}
 
-    // console.log(user);
-    $.ajax({
-        url: "http://localhost:3000/register", 
-        method: "post",
-        data: user
-    })
-        .done(data=>{
-            alert (`username ${email} succesfully created`)
-            loginPage()
-        })
-        .fail(err=>{
-            alert(err.responseJSON.message)
-        })
-}
-
-function login(event){
-    getWeather()
-    event.preventDefault()
-    let email = $("#email").val()
-    let password = $("#password").val()
-
-    let user = {email, password}
-
-    // console.log(user);
-    $.ajax({
-        url: "http://localhost:3000/login", 
-        method: "post",
-        data: user
-    })
-        .done(data=>{
-            localStorage.setItem(`token`, data.token)
-            $("#welcome").text(`Welcome ${data.name}`)
-            afterLogin()
-        })
-        .fail(err=>{
-            alert(err.responseJSON.message)
-        })
-}
-
-function logout(event){
-    event.preventDefault()
-    getWeather()
-    localStorage.removeItem(`token`)
-    clearAll()
-    loginPage()
-}
 
 
 function postTodo(event){
@@ -297,6 +248,93 @@ function getTodos(){
 // 
 /* <td> ${todo.status} === "Not Done" ? <button onclick="doneTodo(${todo.id})" type="button" >Complete</button> : <button onclick="undoneTodo(${todo.id})" type="button" >Un-Complete</button></td> */
 
+function register(event){
+    event.preventDefault()
+    let name = $("#regName").val()
+    let email = $("#regEmail").val()
+    let password = $("#regPassword").val()
+    let type = "normal"
+ 
+    let user = {name, email, type, password}
+
+    // console.log(user);
+    $.ajax({
+        url: "http://localhost:3000/register", 
+        method: "post",
+        data: user
+    })
+        .done(data=>{
+            alert (`username ${email} succesfully created`)
+            loginPage()
+        })
+        .fail(err=>{
+            alert(err.responseJSON.message)
+        })
+}
+
+function login(event){
+    getWeather()
+    event.preventDefault()
+    let email = $("#email").val()
+    let password = $("#password").val()
+
+    let user = {email, password}
+
+    // console.log(user);
+    $.ajax({
+        url: "http://localhost:3000/login", 
+        method: "post",
+        data: user
+    })
+        .done(data=>{
+            localStorage.setItem(`token`, data.token)
+            $("#welcome").text(`Welcome ${data.name}`)
+            afterLogin()
+        })
+        .fail(err=>{
+            alert(err.responseJSON.message)
+        })
+}
+
+function logout(event){
+    event.preventDefault()
+    signOut()
+    getWeather()
+    localStorage.removeItem(`token`)
+    clearAll()
+    loginPage()
+}
+
+function onSignIn(googleUser) {
+    // var profile = googleUser.getBasicProfile();
+    // console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+    // console.log('Name: ' + profile.getName());
+    // console.log('Image URL: ' + profile.getImageUrl());
+    // console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+    var id_token = googleUser.getAuthResponse().id_token;
+    $.ajax({
+        url: "http://localhost:3000/googleLogin",
+        method: "post",
+        data: {
+            token:id_token
+        }
+    })
+        .done(data=>{
+            localStorage.setItem(`token`, data.token)
+            $("#welcome").text(`Welcome ${data.name}`)
+            afterLogin()
+        })
+        .fail(err=>{
+            console.log(err);
+        })
+}
+
+function signOut() {
+    var auth2 = gapi.auth2.getAuthInstance();
+    auth2.signOut().then(function () {
+        console.log('User signed out.');
+    });
+}
 
 $(document).ready(()=>{
     getWeather()
