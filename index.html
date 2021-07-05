@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-signin-client_id" content="720803468380-aqkhnspru3mv4bavbv8o5co365092jvn.apps.googleusercontent.com">
+    <title>Fancy To-Do</title>
+    <style>
+        ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        background-color: #f1f1f1;
+        border: 2px solid #555;
+        }
+
+        navbar {
+        margin-top: 50px;
+        margin-left: 25px;
+        padding: 0;
+        font-size: 15px;
+        float: left;
+        }
+
+        li {
+        float: left;
+        display: inline;
+        text-align: center;
+        border-bottom: 1px solid #555;
+        margin-top: 50px;
+        margin-left: 25px;
+        }
+
+        li a {
+        display: block;
+        color: #000;
+        padding: 12px 0 12px 0;
+        text-decoration: none;
+        }
+
+        table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+        }
+
+        td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+        }
+
+        /* tr:nth-child(even) {
+        background-color: #dddddd;
+        } */
+    </style>
+</head>
+<body>
+    <nav>
+        <h1 >My Todos App</h1>
+        <ul>
+            <li id="nav-mytodos"><a href="#">My To-do</a></li>
+            <li id="nav-addtodos"><a href="#">Add To-do</a></li>
+            <li id="nav-register"><a href="#">Register</a></li>
+            <li id="nav-login"><a href="#">Login</a></li>
+            <li id="nav-logout"><a href="#">Logout</a></li>
+        </ul>
+    </nav>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <p id="welcome" style="color: red;">Welcome</p>
+    <p id="weather" style="color: blue;">Todays weather...</p>
+    <br>
+
+<!-- Form Register -->
+
+    <form id = "submitRegister">
+        <label for="fname">Full Name:</label><br>
+        <input type="text" id="regName" name="name"><br>
+        <label for="fname">Email:</label><br>
+        <input type="text" id="regEmail" name="email"><br>
+        <label for="lname">Password:</label><br>
+        <input type="password" id="regPassword" name="password"><br><br>
+        <input type="submit" value="Register">
+    </form> 
+
+<!-- Form Login -->
+
+    <form id = "submitLogin">
+        <label for="fname">Email:</label><br>
+        <input type="text" id="email" name="email"><br>
+        <label for="lname">Password:</label><br>
+        <input type="password" id="password" name="password"><br><br>
+        <input type="submit" value="Login">
+    </form> 
+    
+    <div id = "googlesign">
+        <p>Or sign in with:</p>
+        <div class="g-signin2" data-onsuccess="onSignIn"></div>
+    </div>
+
+<!-- Form Add Todo (Bisa gak di gabung sama form edit? tapi kalo di clik submit, harus bedain post sama put. bedainya di mana? taruh di parameter function kah?)-->
+    
+    <form id = "submitTodo">
+        <input type="text" hidden id="todo-id">
+        <label for="fname">Title:</label><br>
+        <input type="text" id="todo-title" name="title"><br>
+        <label for="fname">Description:</label><br>
+        <input type="text" id="todo-description" name="description"><br>
+        <label for="fname"> Due Date:</label><br>
+        <input type="date" id="todo-duedate" name="duedate"><br><br>
+        <input type="submit" value="Add/Modify Todo">
+    </form> 
+
+<!-- TodoList -->
+
+<table id="table-todo">
+    <tr id = "table-header">
+        <th>No.</th>
+        <th>Todo</th>
+        <th>Description</th>
+        <th>Status</th>
+        <th>Due Date</th>
+        <th>Complete</th>
+        <th>Actions</th>
+    </tr>
+</table>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    
+    <script>
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId      : '849941572301162',
+                cookie     : true,
+                xfbml      : true,
+                version    : 'v3.2'
+            });
+            FB.getLoginStatus(function(response) {
+                statusChangeCallback(response);
+            });
+        };
+    
+        (function(d, s, id){
+        var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {return;}
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+
+        function statusChangeCallback(response){
+            if(response.status === `connected`){
+                console.log(`Logged in and authenticated`);
+            } else {
+                console.log(`Not authenticated`);
+            }
+        }
+    </script>
+    <script src="./main.js"></script>
+    <a href=""></a>
+</body>
+</html>
